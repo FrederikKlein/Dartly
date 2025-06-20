@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   runApp(const MyApp());
@@ -10,6 +11,16 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+    const Color vintageGreen = Color(0xFF304D29); // Highlight color
+    const Color vintageGreenLight = Color(0xFF6C855A); // lighter shade of Highlight color
+    const Color vintageGreenLighter = Color(0xFFA8BC8B); // even lighter shade of Highlight color
+    const Color vintageGreenDark = Color(0xFF273822); // darker shade of Highlight color
+    const Color vintageBeige = Color(0xFFFFF8DC); // Soft bright beige background (Cornsilk)
+    const Color vintageAccent = Color(0xFFF1A67E); // Special things color
+    const Color vintageAccentLight = Color(0xFFF6D4BA); // lighter shade of Special things color
+    const Color vintageAccentDark = Color(0xFFDB9773); // darker shade of Special things color
+    const Color vintageWhite = Color(0xFFFFFDEB);
+    const Color vintageBlack = Color(0xFF1B1B18);
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
@@ -28,7 +39,33 @@ class MyApp extends StatelessWidget {
         //
         // This works for code too, not just values: Most code changes can be
         // tested with just a hot reload.
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+        colorScheme: const ColorScheme(
+          brightness: Brightness.light, // Beige background suggests a light theme
+          primary: vintageBlack, // Main highlight color
+          onPrimary: vintageWhite, // Text/icons on primary color
+          secondary: vintageAccent, // Accent color for "special things"
+          onSecondary: vintageBlack, // Text/icons on secondary color
+          error: Colors.red, // Default error color
+          onError: vintageWhite, // Text/icons on error color
+          background: vintageWhite, // Overall background color
+          onBackground: vintageBlack, // Text/icons on background color
+          surface: vintageWhite, // Card, dialog, sheet surface color
+          onSurface: vintageBlack, // Text/icons on surface color
+        ),
+        textTheme: TextTheme(
+          displayLarge: const TextStyle(
+            fontSize: 72,
+            fontWeight: FontWeight.bold,
+          ),
+          // ···
+          titleLarge: GoogleFonts.montserrat(
+            fontSize: 30,
+            fontStyle: FontStyle.normal,
+            fontWeight: FontWeight.w600,
+          ),
+          bodyMedium: GoogleFonts.montserrat(),
+          displaySmall: GoogleFonts.montserrat(),
+        ),
       ),
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
