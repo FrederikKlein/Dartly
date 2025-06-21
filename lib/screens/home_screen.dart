@@ -64,8 +64,8 @@ class _HomeScreenState extends State<HomeScreen> {
           // Floating navbar positioned at bottom
           Positioned(
             bottom: AppConstants.defaultPadding,
-            left: AppConstants.largePadding,
-            right: AppConstants.largePadding,
+            left: AppConstants.navBarPadding,
+            right: AppConstants.navBarPadding,
             child: _buildFloatingNavBar(),
           ),
         ],
@@ -163,22 +163,28 @@ class _HomeScreenState extends State<HomeScreen> {
 
 // Helper method to calculate the position of the sliding indicator
   double _getSelectedPosition() {
-    double itemWidth = _getItemWidth(context);
+    double totalWidth = _getTotalWidth(context);
     switch (_selectedScreen) {
       case AppScreen.stats:
         return 0; // First item
       case AppScreen.home:
-        return itemWidth ; // Second item
+        return totalWidth/4 ; // Second item
       case AppScreen.settings:
-        return itemWidth * 2 ; // Third item
+        return totalWidth/4 * 3 ; // Third item
     }
   }
 
+  double _getTotalWidth(BuildContext context){
+    return MediaQuery.of(context).size.width - 2*AppConstants.navBarPadding - AppConstants.smallPadding; // screen margins + container padding
+  }
 // Helper method to calculate item width
   double _getItemWidth(BuildContext context) {
     // Account for container padding and margins
-    double totalWidth = MediaQuery.of(context).size.width - 2*AppConstants.largePadding - 0; // screen margins + container padding
-    return totalWidth / 3; // divided by number of items
+    double totalWidth = _getTotalWidth(context);
+    if(_selectedScreen==AppScreen.home){
+      return totalWidth/2 + AppConstants.smallPadding;
+    }
+    return totalWidth / 4 + AppConstants.smallPadding; // divided by number of items
   }
 
   double _getInterpolationForValue(double x) {
@@ -192,7 +198,7 @@ class _HomeScreenState extends State<HomeScreen> {
       case AppScreen.stats:
         return Icons.bar_chart;
       case AppScreen.home:
-        return Icons.games;
+        return Icons.games_outlined;
       case AppScreen.settings:
         return Icons.settings;
     }
@@ -223,15 +229,17 @@ class _HomeScreenState extends State<HomeScreen> {
           Icon(
             icon,
             color: isSelected ? Colors.white : Colors.grey.shade600,
-            size: 20,
+            size: AppConstants.iconSize,
           ),
           const SizedBox(height: 4),
-          Text(
-            label,
-            style: TextStyle(
-              color: isSelected ? Colors.white : Colors.grey.shade600,
-              fontSize: 12,
-              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+          Visibility(visible: false,child:
+            Text(
+              label,
+              style: TextStyle(
+                color: isSelected ? Colors.white : Colors.grey.shade600,
+                fontSize: 12,
+                fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+              ),
             ),
           ),
         ],

@@ -13,9 +13,11 @@ class AppConstants {
   static const double smallPadding = 8.0;
   static const double tinyPadding = 2.0;
   static const double largePadding = 24.0;
+  static const double navBarPadding = 128;
   static const double edgesFullRounding = 48;
-  static const double navBarHeight = 80;
+  static const double navBarHeight = 64;
 
+  static const double iconSize = 20;
   // Colors (you can customize these)
   static const Color vintageGreen = Color(0xFF304D29); // Highlight color
   static const Color vintageGreenLight = Color(0xFF6C855A); // lighter shade of Highlight color
