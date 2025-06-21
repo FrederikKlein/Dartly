@@ -3,8 +3,14 @@ import 'package:dartly/screens/game_screen.dart';
 import 'package:dartly/screens/new_game_screen.dart';
 import 'package:dartly/screens/settings_screen.dart';
 import 'package:dartly/screens/statistics_screen.dart';
+import 'package:dartly/utils/constants.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import '../models/game_settings.dart';
+import 'package:figma_squircle/figma_squircle.dart';
+
+// Navigation enum for our screens
+enum AppScreen { stats, home, settings }
 
 class HomeScreen extends StatefulWidget {
   HomeScreen({super.key});
@@ -14,18 +20,27 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _selected_index = 1;
-  void _navigateBottombar(int selected_index){
-    setState(() {
-      _selected_index = selected_index;
-    });
-  }
+  AppScreen _selectedScreen = AppScreen.home;
+  int _animationKey = 0;
 
-  final List sites = [
-    StatisticsScreen(),
-    NewGameScreen(),
-    SettingsScreen(),
-  ];
+  // Screen colors for the sliding effect
+  final Map<AppScreen, Color> _screenColors = {
+    AppScreen.stats: AppConstants.vintageGreenLighter, // Blue
+    AppScreen.home: AppConstants.vintageGreenLight, // Green
+    AppScreen.settings: AppConstants.vintageGreenLighter, // Purple
+  };
+
+  // Get the current screen widget
+  Widget _getCurrentScreen() {
+    switch (_selectedScreen) {
+      case AppScreen.stats:
+        return const StatisticsScreen();
+      case AppScreen.home:
+        return const NewGameScreen();
+      case AppScreen.settings:
+        return const SettingsScreen();
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -37,18 +52,191 @@ class _HomeScreenState extends State<HomeScreen> {
     // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(title: Text("Home"),),
-      body: sites[_selected_index],
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selected_index,
-          onTap: _navigateBottombar,
-          items: [
-            //stats
-            BottomNavigationBarItem(icon: Icon(Icons.stacked_bar_chart), label: "Stats"),
-            //play
-            BottomNavigationBarItem(icon: Icon(Icons.games), label: "Play",),
-            //settings
-            BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Settings"),
-          ]),
+      body: Stack(
+        children: [
+          // Main content (full screen)
+          AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            color: _screenColors[_selectedScreen],
+            child: _getCurrentScreen(),
+          ),
+          // Floating navbar positioned at bottom
+          Positioned(
+            bottom: AppConstants.defaultPadding,
+            left: AppConstants.largePadding,
+            right: AppConstants.largePadding,
+            child: _buildFloatingNavBar(),
+          ),
+        ],
+      ),
     );
   }
+
+  Widget _buildFloatingNavBar() {
+    return Container(
+      margin: const EdgeInsets.only(top:AppConstants.smallPadding, bottom: AppConstants.smallPadding),
+      decoration: BoxDecoration(
+        color: AppConstants.vintageWhite.withOpacity(0.95),
+        borderRadius: SmoothBorderRadius(cornerRadius: AppConstants.edgesFullRounding,cornerSmoothing: 100),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.1),
+            blurRadius: 5,
+            offset: const Offset(0, 5),
+          ),
+        ],
+      ),
+      child: Stack(
+        children: [
+          // Animated sliding background
+          // Enhanced fluid animation with morphing effect
+          AnimatedPositioned(
+            duration: const Duration(milliseconds: 450),
+            curve: Curves.easeInOutCubicEmphasized, // Apple-like easing
+            left: _getSelectedPosition(),
+            top: 0,
+            bottom: 0,
+            width: _getItemWidth(context),
+            child: TweenAnimationBuilder<double>(
+              key: ValueKey(_animationKey),
+              duration: const Duration(milliseconds: 300),
+              tween: Tween(begin: -1.0, end: 1.0),
+              builder: (context, value, child) {
+                return Transform.scale(
+                  scaleX: 1.0 + (0.05 * _getInterpolationForValue(value)), // Squeeze and release effect
+                  scaleY: 1.0 + (-0.03 * _getInterpolationForValue(value)),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: _screenColors[_selectedScreen]!,
+                      borderRadius:BorderRadius.all(
+                        Radius.elliptical(
+                          AppConstants.edgesFullRounding * (0.6 + 0.05 * _getInterpolationForValue(value)), // Even more squircle-like
+                          AppConstants.edgesFullRounding,
+                        ),
+                      ), //Static border radius
+                      //borderRadius: BorderRadius.circular(20.0 + (5 * (1 - value))), // Dynamic border radius
+                      boxShadow: [
+                        BoxShadow(
+                          color: _screenColors[_selectedScreen]!.withOpacity(0.4),
+                          blurRadius: 8 + (4 * (1 - value)), // Dynamic shadow
+                          offset: Offset(0, 2 + (2 * (1 - value))),
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              },
+            ),
+          ),
+
+          // Navigation items
+          Row(
+            children: AppScreen.values.map((screen) {
+              bool isSelected = _selectedScreen == screen;
+              return Expanded(
+                child: GestureDetector(
+                  behavior: HitTestBehavior.opaque,
+                  onTap: () {
+                    setState(() {
+                      _selectedScreen = screen;
+                      _animationKey++;
+                    });
+                  },
+                  child: Container(
+                    width: double.infinity,
+                    height: AppConstants.navBarHeight,
+                    child: _buildNavItem(
+                      icon: _getIconForScreen(screen),
+                      label: _getLabelForScreen(screen),
+                      isSelected: isSelected,
+                    ),
+                  ),
+                ),
+              );
+            }).toList(),
+          ),
+        ],
+      ),
+    );
+  }
+
+// Helper method to calculate the position of the sliding indicator
+  double _getSelectedPosition() {
+    double itemWidth = _getItemWidth(context);
+    switch (_selectedScreen) {
+      case AppScreen.stats:
+        return 0; // First item
+      case AppScreen.home:
+        return itemWidth ; // Second item
+      case AppScreen.settings:
+        return itemWidth * 2 ; // Third item
+    }
+  }
+
+// Helper method to calculate item width
+  double _getItemWidth(BuildContext context) {
+    // Account for container padding and margins
+    double totalWidth = MediaQuery.of(context).size.width - 2*AppConstants.largePadding - 0; // screen margins + container padding
+    return totalWidth / 3; // divided by number of items
+  }
+
+  double _getInterpolationForValue(double x) {
+    return 0.75 - x - 0.416667*x*x + x*x*x - 0.333333*x*x*x*x;
+    // 1-x^2
+    return (-(x*x) +1);
+  }
+
+  IconData _getIconForScreen(AppScreen screen) {
+    switch (screen) {
+      case AppScreen.stats:
+        return Icons.bar_chart;
+      case AppScreen.home:
+        return Icons.games;
+      case AppScreen.settings:
+        return Icons.settings;
+    }
+  }
+
+  String _getLabelForScreen(AppScreen screen) {
+    switch (screen) {
+      case AppScreen.stats:
+        return 'Stats';
+      case AppScreen.home:
+        return 'Play';
+      case AppScreen.settings:
+        return 'Settings';
+    }
+  }
+
+  Widget _buildNavItem({
+    required IconData icon,
+    required String label,
+    required bool isSelected,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: AppConstants.defaultPadding, vertical: AppConstants.smallPadding),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(
+            icon,
+            color: isSelected ? Colors.white : Colors.grey.shade600,
+            size: 20,
+          ),
+          const SizedBox(height: 4),
+          Text(
+            label,
+            style: TextStyle(
+              color: isSelected ? Colors.white : Colors.grey.shade600,
+              fontSize: 12,
+              fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
 }

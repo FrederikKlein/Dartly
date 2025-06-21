@@ -11,7 +11,10 @@ class AppConstants {
   // UI constants
   static const double defaultPadding = 16.0;
   static const double smallPadding = 8.0;
+  static const double tinyPadding = 2.0;
   static const double largePadding = 24.0;
+  static const double edgesFullRounding = 48;
+  static const double navBarHeight = 80;
 
   // Colors (you can customize these)
   static const Color vintageGreen = Color(0xFF304D29); // Highlight color
