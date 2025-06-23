@@ -1,19 +1,16 @@
 
-import 'package:dartly/screens/game_screen.dart';
-import 'package:dartly/screens/new_game_screen.dart';
+import 'package:dartly/screens/new_game_scratch.dart';
 import 'package:dartly/screens/settings_screen.dart';
 import 'package:dartly/screens/statistics_screen.dart';
 import 'package:dartly/utils/constants.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import '../models/game_settings.dart';
 import 'package:figma_squircle/figma_squircle.dart';
 
 // Navigation enum for our screens
 enum AppScreen { stats, home, settings }
 
 class HomeScreen extends StatefulWidget {
-  HomeScreen({super.key});
+  const HomeScreen({super.key});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -36,7 +33,7 @@ class _HomeScreenState extends State<HomeScreen> {
       case AppScreen.stats:
         return const StatisticsScreen();
       case AppScreen.home:
-        return const NewGameScreen();
+        return NewGameScreen();
       case AppScreen.settings:
         return const SettingsScreen();
     }
@@ -51,7 +48,6 @@ class _HomeScreenState extends State<HomeScreen> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(title: Text("Home"),),
       body: Stack(
         children: [
           // Main content (full screen)
@@ -93,7 +89,7 @@ class _HomeScreenState extends State<HomeScreen> {
           // Enhanced fluid animation with morphing effect
           AnimatedPositioned(
             duration: const Duration(milliseconds: 450),
-            curve: Curves.easeInOutCubicEmphasized, // Apple-like easing
+            curve: Curves.easeInOutCubicEmphasized, // expressive easing
             left: _getSelectedPosition(),
             top: 0,
             bottom: 0,
@@ -143,7 +139,7 @@ class _HomeScreenState extends State<HomeScreen> {
                       _animationKey++;
                     });
                   },
-                  child: Container(
+                  child: SizedBox(
                     width: double.infinity,
                     height: AppConstants.navBarHeight,
                     child: _buildNavItem(

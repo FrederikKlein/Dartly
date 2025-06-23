@@ -1,4 +1,5 @@
 import 'dart:ui';
+import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppConstants {
@@ -11,10 +12,14 @@ class AppConstants {
   // UI constants
   static const double defaultPadding = 16.0;
   static const double smallPadding = 8.0;
+  static const double verySmallPadding = 4.0;
   static const double tinyPadding = 2.0;
   static const double largePadding = 24.0;
+  static const double extraLargePadding = 32.0;
+  static const double appPadding = 64.0;
   static const double navBarPadding = 128;
   static const double edgesFullRounding = 48;
+  static const double edgesSmallRounding = 4;
   static const double navBarHeight = 64;
 
   static const double iconSize = 20;
@@ -31,17 +36,28 @@ class AppConstants {
   static const Color vintageBlack = Color(0xFF1B1B18);
 
   // Text styles
-  static final TextStyle headingStyle = TextStyle(
-    fontSize: 24,
+  static TextStyle? get headingStyle => TextStyle(
+    fontSize: 40,
     fontWeight: FontWeight.bold,
+    fontFamily: GoogleFonts.montserrat().fontFamily,
   );
-
-  static final TextStyle subheadingStyle = TextStyle(
+  static TextStyle? get subheadingStyle => TextStyle(
     fontSize: 18,
     fontWeight: FontWeight.w600,
+    fontFamily: GoogleFonts.montserrat().fontFamily,
   );
-
-  static final TextStyle bodyStyle = TextStyle(
+  static TextStyle? get buttonTextStyle => TextStyle(
     fontSize: 16,
+    fontWeight: FontWeight.w600,
+    fontFamily: GoogleFonts.montserrat().fontFamily,
+  );
+  static TextStyle? get bodyStyle => TextStyle(
+    fontSize: 16,
+    fontFamily: GoogleFonts.montserrat().fontFamily,
+  );
+  static TextStyle? get startGameButtonTextStyle => TextStyle(
+    fontSize: 24,
+    fontFamily: GoogleFonts.pressStart2p().fontFamily,
+    fontWeight: FontWeight.w900
   );
 }
