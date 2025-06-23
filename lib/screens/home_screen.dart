@@ -78,11 +78,12 @@ class _HomeScreenState extends State<HomeScreen> {
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.1),
-            blurRadius: 5,
-            offset: const Offset(0, 5),
+            blurRadius: 0,
+            offset: const Offset(5, 5),
           ),
         ],
       ),
+      clipBehavior: Clip.antiAlias, // Add this line
       child: Stack(
         children: [
           // Animated sliding background
@@ -115,8 +116,9 @@ class _HomeScreenState extends State<HomeScreen> {
                       boxShadow: [
                         BoxShadow(
                           color: _screenColors[_selectedScreen]!.withOpacity(0.4),
-                          blurRadius: 8 + (4 * (1 - value)), // Dynamic shadow
-                          offset: Offset(0, 2 + (2 * (1 - value))),
+                          //blurRadius: 8 + (4 * (1 - value)), // Dynamic shadow
+                          blurRadius: 0,
+                          offset: Offset(2 + (2 * (1 - value)), 2 + (2 * (1 - value))),
                         ),
                       ],
                     ),
