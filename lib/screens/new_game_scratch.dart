@@ -62,22 +62,26 @@ class _NewGameScreenState extends State<NewGameScreen> {
       GameMode.x01: Text("X01", style: AppConstants.buttonTextStyle),
       GameMode.cricket: Padding(child: Text("Cricket", style: AppConstants.buttonTextStyle), padding: EdgeInsetsGeometry.symmetric(vertical: AppConstants.verySmallPadding)),
     };
-    return Container(
-      width: double.infinity, // Make it full width
-      child: CupertinoSegmentedControl<GameMode>(
-        children: _segmentsMap,
-        groupValue: currentMode, // Default selected value
-        onValueChanged: (GameMode? value) {
-          if (value != null) {
-            setState(() {
-              currentMode = value;
-            });
-          }
-        },
-        borderColor: AppConstants.vintageGreen,
-        selectedColor: AppConstants.vintageGreen,
-        unselectedColor: AppConstants.vintageBeige,
-
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(500),
+      child: Container(
+        width: double.infinity,
+        child: CupertinoSegmentedControl<GameMode>(
+          children: _segmentsMap,
+          groupValue: currentMode,
+          onValueChanged: (GameMode? value) {
+            if (value != null) {
+              setState(() {
+                currentMode = value;
+              });
+            }
+          },
+          borderColor: Colors.transparent,
+          selectedColor: AppConstants.vintageGreen,
+          unselectedColor: AppConstants.vintageBeige,
+          pressedColor: AppConstants.vintageGreen.withOpacity(0.2),
+          padding: const EdgeInsets.all(0),
+        ),
       ),
     );
     return Text("mode selection");
