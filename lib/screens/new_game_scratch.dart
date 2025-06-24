@@ -84,7 +84,6 @@ class _NewGameScreenState extends State<NewGameScreen> {
         ),
       ),
     );
-    return Text("mode selection");
   }
 
   Widget _buildGameOptionsSection(){
