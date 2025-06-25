@@ -1,25 +1,28 @@
 import 'package:dartly/utils/constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../services/settings_service.dart';
 
 enum GameMode { x01, cricket }
-enum X01OutMode { straight, double, triple }
-enum X01InMode { straight, double, triple}
-const X01StartValue = [301,401,501,601,701,801,901,1001];
 var currentMode = GameMode.x01; // Default mode
-var currentX01OutMode = X01OutMode.triple; // Default out mode
-var currentX01InMode = X01InMode.double; // Default in mode
-var currentX01StartValue = X01StartValue[0]; // Default start value
 
-class NewGameScreen extends StatefulWidget {
+class NewGameScreen extends ConsumerStatefulWidget {
   const NewGameScreen({super.key});
 
   @override
   _NewGameScreenState createState() => _NewGameScreenState();
 }
 
-class _NewGameScreenState extends State<NewGameScreen> {
+class _NewGameScreenState extends ConsumerState<NewGameScreen> {
   bool _isHovering = false;
+  @override
+  void initState() {
+    super.initState();
+    // "ref" can be used in all life-cycles of a StatefulWidget.
+    ref.read(optionsServiceProvider);
+  }
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -106,145 +109,11 @@ class _NewGameScreenState extends State<NewGameScreen> {
   Widget _buildX01Options(){
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+      spacing: AppConstants.defaultPadding,
       children: [
-        Expanded(
-          flex: 1,
-          child: StatefulBuilder(
-            builder: (context, setState) {
-              final GlobalKey _containerKey = GlobalKey();
-              return GestureDetector(
-                onTap: () async {
-                  final RenderBox? renderBox = _containerKey.currentContext?.findRenderObject() as RenderBox?;
-                  final Offset? offset = renderBox?.localToGlobal(Offset.zero);
-                  final Size? size = renderBox?.size;
-
-                  final selected = await showDialog<X01OutMode>(
-                    context: context,
-                    barrierColor: Colors.transparent,
-                    builder: (context) {
-                      return Stack(
-                        children: [
-                          GestureDetector(
-                            onTap: () => Navigator.of(context).pop(),
-                            child: Container(
-                              color: Colors.transparent,
-                            ),
-                          ),
-                          AnimatedPositioned(
-                            duration: Duration(milliseconds: 200),
-                            left: offset?.dx ?? 0,
-                            top: offset?.dy ?? X01OutMode.values.indexOf(currentX01OutMode) * 48.0 + 48,
-                            width: size?.width ?? 60,
-                            child: Material(
-                              color: Colors.transparent,
-                              child: Container(
-                                width: size?.width ?? 60,
-                                constraints: BoxConstraints(
-                                  maxHeight: 144,
-                                ),
-                                child: Card(
-                                  margin: EdgeInsets.zero,
-                                  child: ListView.builder(
-                                    shrinkWrap: true,
-                                    itemCount: X01OutMode.values.length,
-                                    itemExtent: 48,
-                                    itemBuilder: (context, index) {
-                                      final value = X01OutMode.values[index];
-                                      return ListTile(
-                                        title: Text(value.name[0].toUpperCase() + value.name.substring(1), style: AppConstants.buttonTextStyle, textAlign: TextAlign.center,),
-                                        selected: value == currentX01OutMode,
-                                        onTap: () => Navigator.pop(context, value),
-                                      );
-                                    },
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  );
-                  if (selected != null) {
-                    setState(() {
-                      currentX01OutMode = selected;
-                    });
-                  }
-                },
-                child: Container(
-                  key: _containerKey,
-                  margin: EdgeInsets.symmetric(horizontal: AppConstants.smallPadding),
-                  padding: EdgeInsets.symmetric(horizontal: AppConstants.defaultPadding, vertical: AppConstants.defaultPadding),
-                  decoration: BoxDecoration(
-                    borderRadius: BorderRadius.circular(8),
-                    color: AppConstants.vintageBeige
-                  ),
-                  width: double.infinity,
-                  child: Text(
-                    currentX01OutMode.name[0].toUpperCase() + currentX01OutMode.name.substring(1),
-                    style: AppConstants.buttonTextStyle,
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
-        Expanded(
-          flex: 1,
-          child: StatefulBuilder(
-            builder: (context, setState) {
-              return GestureDetector(
-                onTap: () async {
-                  final selected = await showDialog<X01OutMode>(
-                    context: context,
-                    builder: (context) {
-                      final controller = ScrollController(
-                        initialScrollOffset: X01OutMode.values.indexOf(currentX01OutMode) * 48.0 - 48.0,
-                      );
-                      return AlertDialog(
-                        contentPadding: EdgeInsets.zero,
-                        content: SizedBox(
-                          height: 144,
-                          width: 60,
-                          child: ListView.builder(
-                            controller: controller,
-                            itemCount: X01OutMode.values.length,
-                            itemExtent: 48,
-                            itemBuilder: (context, index) {
-                              final value = X01OutMode.values[index];
-                              return ListTile(
-                                title: Text(value.name[0].toUpperCase() + value.name.substring(1)),
-                                selected: value == currentX01OutMode,
-                                onTap: () => Navigator.pop(context, value),
-                              );
-                            },
-                          ),
-                        ),
-                      );
-                    },
-                  );
-                  if (selected != null) {
-                    setState(() {
-                      currentX01OutMode = selected;
-                    });
-                  }
-                },
-                child: Container(
-                  padding: EdgeInsets.symmetric(horizontal: AppConstants.defaultPadding, vertical: AppConstants.mediumPadding),
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.grey),
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  width: double.infinity,
-                  child: Text(
-                    currentX01OutMode.name[0].toUpperCase() + currentX01OutMode.name.substring(1),
-                  ),
-                ),
-              );
-            },
-          ),
-        ),
+        _buildOptionItem('x01InMode'),
+        _buildOptionItem('x01StartValue'),
+        _buildOptionItem('x01OutMode'),
       ],
     );
   }
@@ -301,6 +170,94 @@ class _NewGameScreenState extends State<NewGameScreen> {
           ),
         ),
       )
+    );
+  }
+
+  _buildOptionItem(String optionType) {
+    String _optionType = optionType;
+    return Expanded(
+      flex: 1,
+      child: StatefulBuilder(
+        builder: (context, setState) {
+          final GlobalKey _containerKey = GlobalKey();
+          return GestureDetector(
+            onTap: () async {
+              final RenderBox? renderBox = _containerKey.currentContext?.findRenderObject() as RenderBox?;
+              final Offset? offset = renderBox?.localToGlobal(Offset.zero);
+              final Size? size = renderBox?.size;
+
+              final selected = await showDialog(
+                context: context,
+                barrierColor: Colors.transparent,
+                builder: (context) {
+                  return Stack(
+                    children: [
+                      GestureDetector(
+                        onTap: () => Navigator.of(context).pop(),
+                        child: Container(
+                          color: Colors.transparent,
+                        ),
+                      ),
+                      Positioned(
+                        left: offset?.dx ?? 0,
+                        top: offset?.dy ?? 48,
+                        width: size?.width ?? 60,
+                        child: Material(
+                          color: Colors.transparent,
+                          child: Container(
+                            width: size?.width ?? 60,
+                            constraints: BoxConstraints(
+                              maxHeight: 48*ref.watch(optionsServiceProvider).getOptions(optionType).length.toDouble(),
+                            ),
+                            child: Card(
+                              color: AppConstants.vintageBeige,
+                              margin: EdgeInsets.zero,
+                              child: ListView.builder(
+                                shrinkWrap: true,
+                                itemCount: ref.watch(optionsServiceProvider).getOptions(optionType).length,
+                                itemExtent: 48,
+                                itemBuilder: (context, index) {
+                                  final value = ref.watch(optionsServiceProvider).getOptions(optionType)[index];
+                                  return ListTile(
+                                    title: Text(value.toString(), style: AppConstants.buttonTextStyle, textAlign: TextAlign.center, ),
+                                    selected: value == ref.watch(optionsServiceProvider).getCurrentOption(optionType),
+                                    selectedColor: AppConstants.vintageAccentDark,
+                                    onTap: () => Navigator.pop(context, value),
+                                  );
+                                },
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  );
+                },
+              );
+              if (selected != null) {
+                setState(() {
+                  ref.read(optionsServiceProvider).setOption(_optionType, selected);
+                });
+              }
+            },
+            child: Container(
+              key: _containerKey,
+              padding: EdgeInsets.symmetric(horizontal: AppConstants.defaultPadding, vertical: AppConstants.defaultPadding),
+              decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(8),
+                  color: AppConstants.vintageBeige
+              ),
+              width: double.infinity,
+              child: Text(
+                ref.watch(optionsServiceProvider).getCurrentOption(optionType).toString(),
+                style: AppConstants.buttonTextStyle,
+                textAlign: TextAlign.center,
+              ),
+
+            ),
+          );
+        },
+      ),
     );
   }
 }
