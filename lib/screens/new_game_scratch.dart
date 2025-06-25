@@ -1,3 +1,4 @@
+import 'package:dartly/services/player_service.dart';
 import 'package:dartly/utils/constants.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
@@ -22,6 +23,7 @@ class _NewGameScreenState extends ConsumerState<NewGameScreen> {
     super.initState();
     // "ref" can be used in all life-cycles of a StatefulWidget.
     ref.read(optionsServiceProvider);
+    ref.read(playersProvider);
   }
   @override
   Widget build(BuildContext context) {
@@ -119,7 +121,25 @@ class _NewGameScreenState extends ConsumerState<NewGameScreen> {
   }
 
   Widget _buildPlayerSection(){
-    return Text("player selection");
+    return Card(
+      color: AppConstants.vintageBeige,
+      margin: EdgeInsets.zero,
+      child: ListView.builder(
+        shrinkWrap: true,
+        itemCount: ref.watch(playersProvider).length,
+        itemExtent: 48,
+        itemBuilder: (context, index) {
+          final value = ref.watch(playersProvider)[index];
+          return ListTile(
+            leading: Icon(Icons.drag_handle),
+            trailing: Icon(Icons.edit),
+            title: Text(value.name, style: AppConstants.buttonTextStyle, textAlign: TextAlign.center, ),
+            selectedColor: AppConstants.vintageAccentDark,
+            enabled: ref.watch(playersProvider)[index].isEnabled,
+          );
+        },
+      ),
+    );
   }
 
   Widget _buildStartGameButton(){
