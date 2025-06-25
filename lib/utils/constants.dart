@@ -11,6 +11,7 @@ class AppConstants {
 
   // UI constants
   static const double defaultPadding = 16.0;
+  static const double mediumPadding = 12.0;
   static const double smallPadding = 8.0;
   static const double verySmallPadding = 4.0;
   static const double tinyPadding = 2.0;
