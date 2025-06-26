@@ -212,8 +212,13 @@ class _NewGameScreenState extends ConsumerState<NewGameScreen> {
     return Container(
       width: double.infinity, // Make it full width
       padding: EdgeInsets.symmetric(horizontal: AppConstants.extraLargePadding),
-      child: MouseRegion(
+      child: GestureDetector(
+        onTapDown: (_) => setState(() => _isHovering = true),
+        onTapUp: (_) => setState(() => _isHovering = false),
+        onTapCancel: () => setState(() => _isHovering = false),
+        child: MouseRegion(
         onEnter: (_) => setState(() => _isHovering = true),
+        onHover: (_) => setState(() => _isHovering = true),
         onExit: (_) => setState(() => _isHovering = false),
         child: AnimatedContainer(
           duration: Duration(milliseconds: 150),
@@ -255,7 +260,7 @@ class _NewGameScreenState extends ConsumerState<NewGameScreen> {
             ),
           ),
         ),
-      )
+      ))
     );
   }
 
@@ -272,41 +277,56 @@ class _NewGameScreenState extends ConsumerState<NewGameScreen> {
               final Offset? offset = renderBox?.localToGlobal(Offset.zero);
               final Size? size = renderBox?.size;
 
-              final selected = await showDialog(
+              final selected = await showGeneralDialog<String>(
                 context: context,
                 barrierColor: Colors.transparent,
-                builder: (context) {
-                  return Stack(
-                    clipBehavior: Clip.none,
-                    children: [
-                      GestureDetector(
-                        onTap: () => Navigator.of(context).pop(),
-                        child: Container(
-                          color: Colors.transparent,
+                barrierDismissible: true,
+                barrierLabel: '', // Add this line
+                pageBuilder: (context, animation, secondaryAnimation) {
+                  // Calculate the selected item position
+                  final currentValue = ref.watch(optionsServiceProvider).getCurrentOption(optionType);
+                  final options = ref.watch(optionsServiceProvider).getOptions(optionType);
+                  final currentSelectedIndex = options.indexOf(currentValue);
+                  final itemHeight = 48.0;
+
+                  // Calculate the top position to center the selected item on the click point
+                  final adjustedTop = (offset?.dy ?? 0) - (currentSelectedIndex * itemHeight);
+
+                  return Material(
+                    color: Colors.transparent,
+                    child: Stack(
+                      clipBehavior: Clip.none,
+                      children: [
+                        GestureDetector(
+                          onTap: () => Navigator.of(context).pop(),
+                          child: Container(
+                            width: double.infinity,
+                            height: double.infinity,
+                            color: Colors.transparent,
+                          ),
                         ),
-                      ),
-                      Positioned(
-                        left: offset?.dx ?? 0,
-                        top: offset?.dy ?? 120,
-                        width: size?.width ?? 60,
-                        child: Material(
-                          color: Colors.transparent,
+                        Positioned(
+                          left: offset?.dx ?? 0,
+                          top: adjustedTop,
+                          width: size?.width ?? 60,
                           child: Container(
                             width: size?.width ?? 60,
                             constraints: BoxConstraints(
                               maxHeight: 48*ref.watch(optionsServiceProvider).getOptions(optionType).length.toDouble(),
                             ),
                             child: Card(
+                              elevation: 0,
                               color: AppConstants.vintageBeige,
                               margin: EdgeInsets.zero,
                               child: ListView.builder(
+                                padding: EdgeInsets.zero,
                                 shrinkWrap: true,
                                 itemCount: ref.watch(optionsServiceProvider).getOptions(optionType).length,
                                 itemExtent: 48,
                                 itemBuilder: (context, index) {
                                   final value = ref.watch(optionsServiceProvider).getOptions(optionType)[index];
                                   return ListTile(
-                                    title: Text(value.toString(), style: AppConstants.buttonTextStyle, textAlign: TextAlign.center, ),
+                                    title: Text(value.toString(), style: AppConstants.buttonTextStyle, textAlign: TextAlign.center),
                                     selected: value == ref.watch(optionsServiceProvider).getCurrentOption(optionType),
                                     selectedColor: AppConstants.vintageAccentDark,
                                     onTap: () => Navigator.pop(context, value),
@@ -319,12 +339,12 @@ class _NewGameScreenState extends ConsumerState<NewGameScreen> {
                             ),
                           ),
                         ),
-                      ),
-                    ],
+                      ],
+                    ),
                   );
                 },
               );
-              if (selected != null) {
+              if (selected != null && selected is String) {
                 setState(() {
                   ref.read(optionsServiceProvider).setOption(optionType0, selected);
                 });
