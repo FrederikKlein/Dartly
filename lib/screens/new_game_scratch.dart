@@ -27,11 +27,12 @@ class _NewGameScreenState extends ConsumerState<NewGameScreen> {
   }
   @override
   Widget build(BuildContext context) {
+    double _app_padding = AppConstants.getAppPadding(context);
     return Scaffold(
       backgroundColor: AppConstants.vintageWhite,
       body: Center(
         child: Padding(
-          padding: const EdgeInsets.all(AppConstants.appPadding),
+          padding: EdgeInsets.all(_app_padding),
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -86,9 +87,9 @@ class _NewGameScreenState extends ConsumerState<NewGameScreen> {
             }
           },
           borderColor: Colors.transparent,
-          selectedColor: AppConstants.vintageGreen,
+          selectedColor: AppConstants.vintageGreenLight,
           unselectedColor: AppConstants.vintageBeige,
-          pressedColor: AppConstants.vintageGreen.withOpacity(0.2),
+          pressedColor: AppConstants.vintageGreenLight,
           padding: const EdgeInsets.all(0),
           // disable the game mode cricket
           disabledChildren: <GameMode>{
@@ -111,7 +112,7 @@ class _NewGameScreenState extends ConsumerState<NewGameScreen> {
   Widget _buildX01Options(){
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-      spacing: AppConstants.defaultPadding,
+      spacing: AppConstants.smallPadding,
       children: [
         _buildOptionItem('x01InMode'),
         _buildOptionItem('x01StartValue'),
@@ -135,6 +136,7 @@ class _NewGameScreenState extends ConsumerState<NewGameScreen> {
             itemBuilder: (context, index) {
               final value = ref.watch(playersProvider)[index];
               return ListTile(
+                contentPadding: EdgeInsetsGeometry.directional(start: AppConstants.defaultPadding, end: AppConstants.smallPadding),
                 key: ValueKey(value.id),
                 title: Text(value.name, style: AppConstants.buttonTextStyle, textAlign: TextAlign.center, ),
                 selectedColor: AppConstants.vintageAccentDark,
@@ -145,6 +147,7 @@ class _NewGameScreenState extends ConsumerState<NewGameScreen> {
                   onPressed: () {
                     ref.read(playersProvider.notifier).togglePlayerEnabled(value.id);
                   },
+                  padding: EdgeInsets.zero,
                 ),
                 leading: ReorderableDragStartListener(
                   index: index, // The index of the item in the current list view
@@ -274,6 +277,7 @@ class _NewGameScreenState extends ConsumerState<NewGameScreen> {
                 barrierColor: Colors.transparent,
                 builder: (context) {
                   return Stack(
+                    clipBehavior: Clip.none,
                     children: [
                       GestureDetector(
                         onTap: () => Navigator.of(context).pop(),
@@ -283,7 +287,7 @@ class _NewGameScreenState extends ConsumerState<NewGameScreen> {
                       ),
                       Positioned(
                         left: offset?.dx ?? 0,
-                        top: offset?.dy ?? 48,
+                        top: offset?.dy ?? 120,
                         width: size?.width ?? 60,
                         child: Material(
                           color: Colors.transparent,
@@ -306,6 +310,9 @@ class _NewGameScreenState extends ConsumerState<NewGameScreen> {
                                     selected: value == ref.watch(optionsServiceProvider).getCurrentOption(optionType),
                                     selectedColor: AppConstants.vintageAccentDark,
                                     onTap: () => Navigator.pop(context, value),
+                                    trailing: null,
+                                    leading: null,
+                                    contentPadding: EdgeInsets.zero,
                                   );
                                 },
                               ),

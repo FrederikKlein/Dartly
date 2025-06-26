@@ -60,8 +60,8 @@ class _HomeScreenState extends State<HomeScreen> {
           // Floating navbar positioned at bottom
           Positioned(
             bottom: AppConstants.defaultPadding,
-            left: AppConstants.navBarPadding,
-            right: AppConstants.navBarPadding,
+            left: AppConstants.getNavBarPadding(context),
+            right: AppConstants.getNavBarPadding(context),
             child: _buildFloatingNavBar(),
           ),
         ],
@@ -173,7 +173,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   double _getTotalWidth(BuildContext context){
-    return MediaQuery.of(context).size.width - 2*AppConstants.navBarPadding - AppConstants.smallPadding; // screen margins + container padding
+    return MediaQuery.of(context).size.width - 2*AppConstants.getNavBarPadding(context) - AppConstants.smallPadding; // screen margins + container padding
   }
 // Helper method to calculate item width
   double _getItemWidth(BuildContext context) {
