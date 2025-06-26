@@ -52,6 +52,11 @@ class AppConstants {
     fontWeight: FontWeight.w600,
     fontFamily: GoogleFonts.montserrat().fontFamily,
   );
+  static TextStyle? get buttonTextExtraBigStyle => TextStyle(
+    fontSize: 24,
+    fontWeight: FontWeight.w600,
+    fontFamily: GoogleFonts.montserrat().fontFamily,
+  );
   static TextStyle? get bodyStyle => TextStyle(
     fontSize: 16,
     fontFamily: GoogleFonts.montserrat().fontFamily,

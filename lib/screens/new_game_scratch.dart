@@ -122,22 +122,85 @@ class _NewGameScreenState extends ConsumerState<NewGameScreen> {
 
   Widget _buildPlayerSection(){
     return Card(
+      elevation: 0,
       color: AppConstants.vintageBeige,
       margin: EdgeInsets.zero,
-      child: ListView.builder(
-        shrinkWrap: true,
-        itemCount: ref.watch(playersProvider).length,
-        itemExtent: 48,
-        itemBuilder: (context, index) {
-          final value = ref.watch(playersProvider)[index];
-          return ListTile(
-            leading: Icon(Icons.drag_handle),
-            trailing: Icon(Icons.edit),
-            title: Text(value.name, style: AppConstants.buttonTextStyle, textAlign: TextAlign.center, ),
-            selectedColor: AppConstants.vintageAccentDark,
-            enabled: ref.watch(playersProvider)[index].isEnabled,
-          );
-        },
+      child: Column(
+        children: [
+          ReorderableListView.builder(
+            buildDefaultDragHandles: false,
+            shrinkWrap: true,
+            itemCount: ref.watch(playersProvider).length,
+            itemExtent: 48,
+            itemBuilder: (context, index) {
+              final value = ref.watch(playersProvider)[index];
+              return ListTile(
+                key: ValueKey(value.id),
+                title: Text(value.name, style: AppConstants.buttonTextStyle, textAlign: TextAlign.center, ),
+                selectedColor: AppConstants.vintageAccentDark,
+                enabled: ref.watch(playersProvider)[index].isEnabled,
+                trailing: IconButton(
+                  icon: Icon(value.isEnabled ? Icons.check_circle : Icons.circle),
+                  color: value.isEnabled ? AppConstants.vintageGreenLight : Colors.grey,
+                  onPressed: () {
+                    ref.read(playersProvider.notifier).togglePlayerEnabled(value.id);
+                  },
+                ),
+                leading: ReorderableDragStartListener(
+                  index: index, // The index of the item in the current list view
+                  child: const Icon(Icons.drag_handle),
+                ),
+              );
+            }, onReorder: (int oldIndex, int newIndex) {
+              ref.read(playersProvider.notifier).reorderPlayers(oldIndex, newIndex);
+          },
+          ),
+          ListTile(
+            onTap: () {
+              // accept text input for new player name
+              String? newPlayerName = '';
+              showDialog(
+                context: context,
+                builder: (context) {
+                  return AlertDialog(
+                    title: Text("Add Player", style: AppConstants.subheadingStyle, textAlign: TextAlign.center,),
+                    backgroundColor: AppConstants.vintageBeige,
+                    content: TextField(
+                      autofocus: true,
+                      decoration: InputDecoration(hintText: "Enter player name", fillColor: AppConstants.vintageWhite,focusColor: AppConstants.vintageGreenLight),
+                      cursorColor: AppConstants.vintageGreenLight,
+                      style: AppConstants.buttonTextStyle,
+                      onChanged: (value) {
+                        newPlayerName = value;
+                      },
+                    ),
+                    actions: [
+                      TextButton(
+                        onPressed: () => Navigator.of(context).pop(),
+                        child: Text("Cancel", style: AppConstants.buttonTextStyle!.copyWith(color: AppConstants.vintageBlack.withAlpha(180))),
+                      ),
+                      TextButton(
+                        onPressed: () {
+                          if (newPlayerName != null && newPlayerName!.isNotEmpty) {
+                            Navigator.of(context).pop();
+                          }
+                        },
+                        child: Text("Add", style: AppConstants.buttonTextStyle!.copyWith(color: AppConstants.vintageGreen)),
+                      ),
+                    ],
+                  );
+                },
+              ).then((_) {
+                if (newPlayerName != null && newPlayerName!.isNotEmpty) {
+                  ref.read(playersProvider.notifier).addPlayer(newPlayerName!);
+                }
+              });
+              //ref.read(playersProvider.notifier).addPlayer(newPlayerName);
+            },
+            key: ValueKey('addPlayer'),
+            title: Text("+", style: AppConstants.buttonTextExtraBigStyle!.copyWith(color: AppConstants.vintageBlack.withAlpha(180)), textAlign: TextAlign.center, ),
+          )
+        ],
       ),
     );
   }
