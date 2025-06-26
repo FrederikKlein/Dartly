@@ -67,16 +67,16 @@ class _NewGameScreenState extends ConsumerState<NewGameScreen> {
     return Text("New Game", style: AppConstants.headingStyle);
   }
   Widget _buildGameModeSection(){
-    var _segmentsMap = <GameMode, Widget>{
+    var segmentsMap = <GameMode, Widget>{
       GameMode.x01: Text("X01", style: AppConstants.buttonTextStyle),
-      GameMode.cricket: Padding(child: Text("Cricket", style: AppConstants.buttonTextStyle), padding: EdgeInsetsGeometry.symmetric(vertical: AppConstants.verySmallPadding)),
+      GameMode.cricket: Padding(padding: EdgeInsetsGeometry.symmetric(vertical: AppConstants.verySmallPadding), child: Text("Cricket", style: AppConstants.buttonTextStyle)),
     };
     return ClipRRect(
       borderRadius: BorderRadius.circular(500),
-      child: Container(
+      child: SizedBox(
         width: double.infinity,
         child: CupertinoSegmentedControl<GameMode>(
-          children: _segmentsMap,
+          children: segmentsMap,
           groupValue: currentMode,
           onValueChanged: (GameMode? value) {
             if (value != null) {
@@ -257,15 +257,15 @@ class _NewGameScreenState extends ConsumerState<NewGameScreen> {
   }
 
   _buildOptionItem(String optionType) {
-    String _optionType = optionType;
+    String optionType0 = optionType;
     return Expanded(
       flex: 1,
       child: StatefulBuilder(
         builder: (context, setState) {
-          final GlobalKey _containerKey = GlobalKey();
+          final GlobalKey containerKey = GlobalKey();
           return GestureDetector(
             onTap: () async {
-              final RenderBox? renderBox = _containerKey.currentContext?.findRenderObject() as RenderBox?;
+              final RenderBox? renderBox = containerKey.currentContext?.findRenderObject() as RenderBox?;
               final Offset? offset = renderBox?.localToGlobal(Offset.zero);
               final Size? size = renderBox?.size;
 
@@ -319,12 +319,12 @@ class _NewGameScreenState extends ConsumerState<NewGameScreen> {
               );
               if (selected != null) {
                 setState(() {
-                  ref.read(optionsServiceProvider).setOption(_optionType, selected);
+                  ref.read(optionsServiceProvider).setOption(optionType0, selected);
                 });
               }
             },
             child: Container(
-              key: _containerKey,
+              key: containerKey,
               padding: EdgeInsets.symmetric(horizontal: AppConstants.defaultPadding, vertical: AppConstants.defaultPadding),
               decoration: BoxDecoration(
                   borderRadius: BorderRadius.circular(8),
